@@ -123,6 +123,7 @@ pub fn bond(
     let new_delegation = Delegation {
         validator: validator.clone(),
         amount: amount_to_bond.u128(),
+        bond_denom,
     };
 
     // Query the current supply of Steak and compute the amount to mint
@@ -204,7 +205,7 @@ pub fn reinvest(deps: DepsMut, env: Env) -> StdResult<Response> {
             amount = d.amount;
         }
     }
-    let new_delegation = Delegation::new(validator, amount_to_bond.u128());
+    let new_delegation = Delegation::new(validator, amount_to_bond.u128(), &bond_denom);
 
     unlocked_coins.retain(|coin| coin.denom != bond_denom);
     state.unlocked_coins.save(deps.storage, &unlocked_coins)?;

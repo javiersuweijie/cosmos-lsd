@@ -77,7 +77,7 @@ pub(crate) fn compute_undelegations(
 
         if uluna_to_undelegate > 0 {
             new_undelegations.push(
-                Undelegation::new(&d.validator, uluna_to_undelegate),
+                Undelegation::new(&d.validator, uluna_to_undelegate, &d.bond_denom),
             );
         }
 
@@ -123,7 +123,7 @@ pub(crate) fn compute_redelegations_for_removal(
 
         if uluna_to_redelegate > 0 {
             new_redelegations.push(
-                Redelegation::new(&delegation_to_remove.validator, &d.validator, uluna_to_redelegate),
+                Redelegation::new(&delegation_to_remove.validator, &d.validator, uluna_to_redelegate, &d.bond_denom),
             );
         }
 
@@ -160,10 +160,10 @@ pub(crate) fn compute_redelegations_for_rebalancing(
 
         match d.amount.cmp(&uluna_for_validator) {
             Ordering::Greater => {
-                src_delegations.push(Delegation::new(&d.validator, d.amount - uluna_for_validator));
+                src_delegations.push(Delegation::new(&d.validator, d.amount - uluna_for_validator, &d.bond_denom));
             },
             Ordering::Less => {
-                dst_delegations.push(Delegation::new(&d.validator, uluna_for_validator - d.amount));
+                dst_delegations.push(Delegation::new(&d.validator, uluna_for_validator - d.amount, &d.bond_denom));
             },
             Ordering::Equal => (),
         }
@@ -188,7 +188,7 @@ pub(crate) fn compute_redelegations_for_rebalancing(
         }
 
         new_redelegations.push(
-            Redelegation::new(&src_delegation.validator, &dst_delegation.validator, uluna_to_redelegate),
+            Redelegation::new(&src_delegation.validator, &dst_delegation.validator, uluna_to_redelegate, &src_delegation.bond_denom),
         );
     }
 

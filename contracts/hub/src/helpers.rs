@@ -27,9 +27,12 @@ pub(crate) fn query_delegation(
     validator: &str,
     delegator_addr: &Addr,
 ) -> StdResult<Delegation> {
+    let queried_delegation = querier.query_delegation(delegator_addr, validator)?;
+    let delegated_coin = queried_delegation.map(|fd| fd.amount).unwrap_or(Coin::new(0, ""));
     Ok(Delegation {
         validator: validator.to_string(),
-        amount: querier.query_delegation(delegator_addr, validator)?.map(|fd| fd.amount.amount.u128()).unwrap_or(0),
+        amount: delegated_coin.amount.u128(),
+        bond_denom: delegated_coin.denom,
     })
 }
 
