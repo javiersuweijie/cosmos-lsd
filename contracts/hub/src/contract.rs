@@ -6,7 +6,7 @@ use cw20::Cw20ReceiveMsg;
 
 use steak::hub::{CallbackMsg, ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg, ReceiveMsg};
 
-use crate::helpers::{parse_received_fund, unwrap_reply};
+use crate::helpers::{unwrap_reply};
 use crate::state::State;
 use crate::{execute, queries};
 
@@ -31,7 +31,7 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
             deps,
             env,
             receiver.map(|s| api.addr_validate(&s)).transpose()?.unwrap_or(info.sender),
-            parse_received_fund(&info.funds, "uluna")?,
+            &info.funds,
         ),
         ExecuteMsg::WithdrawUnbonded {
             receiver,

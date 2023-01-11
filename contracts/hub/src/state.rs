@@ -26,6 +26,8 @@ pub(crate) struct State<'a> {
     pub previous_batches: IndexedMap<'a, u64, Batch, PreviousBatchesIndexes<'a>>,
     /// Users' shares in unbonding batches
     pub unbond_requests: IndexedMap<'a, (u64, &'a Addr), UnbondRequest, UnbondRequestsIndexes<'a>>,
+    /// Chain's bond denom
+    pub bond_denom: Item<'a, String>,
 }
 
 impl Default for State<'static> {
@@ -55,6 +57,7 @@ impl Default for State<'static> {
             pending_batch: Item::new("pending_batch"),
             previous_batches: IndexedMap::new("previous_batches", pb_indexes),
             unbond_requests: IndexedMap::new("unbond_requests", ubr_indexes),
+            bond_denom: Item::new("bond_denom"),
         }
     }
 }

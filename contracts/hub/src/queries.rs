@@ -32,17 +32,17 @@ pub fn state(deps: Deps, env: Env) -> StdResult<StateResponse> {
 
     let validators = state.validators.load(deps.storage)?;
     let delegations = query_delegations(&deps.querier, &validators, &env.contract.address)?;
-    let total_uluna: u128 = delegations.iter().map(|d| d.amount).sum();
+    let total_amount: u128 = delegations.iter().map(|d| d.amount).sum();
 
     let exchange_rate = if total_usteak.is_zero() {
         Decimal::one()
     } else {
-        Decimal::from_ratio(total_uluna, total_usteak)
+        Decimal::from_ratio(total_amount, total_usteak)
     };
 
     Ok(StateResponse {
         total_usteak,
-        total_uluna: Uint128::new(total_uluna),
+        total_amount: Uint128::new(total_amount),
         exchange_rate,
         unlocked_coins: state.unlocked_coins.load(deps.storage)?,
     })

@@ -45,6 +45,7 @@ fn setup_test() -> OwnedDeps<MockStorage, MockApi, CustomQuerier> {
             epoch_period: 259200,   // 3 * 24 * 60 * 60 = 3 days
             unbond_period: 1814400, // 21 * 24 * 60 * 60 = 21 days
             validators: vec!["alice".to_string(), "bob".to_string(), "charlie".to_string()],
+            bond_denom: "uluna".to_string(),
         },
     )
     .unwrap();
@@ -124,7 +125,7 @@ fn proper_instantiation() {
         res,
         StateResponse {
             total_usteak: Uint128::zero(),
-            total_uluna: Uint128::zero(),
+            total_amount: Uint128::zero(),
             exchange_rate: Decimal::one(),
             unlocked_coins: vec![],
         },
@@ -236,7 +237,7 @@ fn bonding() {
         res,
         StateResponse {
             total_usteak: Uint128::new(1012043),
-            total_uluna: Uint128::new(1037345),
+            total_amount: Uint128::new(1037345),
             exchange_rate: Decimal::from_ratio(1037345u128, 1012043u128),
             unlocked_coins: vec![],
         }
@@ -626,7 +627,7 @@ fn submitting_batch() {
             id: 1,
             reconciled: false,
             total_shares: Uint128::new(92876),
-            uluna_unclaimed: Uint128::new(95197),
+            amount_unclaimed: Uint128::new(95197),
             est_unbond_end_time: 2083601 // 269,201 + 1,814,400
         }
     );
@@ -642,28 +643,28 @@ fn reconciling() {
             id: 1,
             reconciled: true,
             total_shares: Uint128::new(92876),
-            uluna_unclaimed: Uint128::new(95197), // 1.025 Luna per Steak
+            amount_unclaimed: Uint128::new(95197), // 1.025 Luna per Steak
             est_unbond_end_time: 10000,
         },
         Batch {
             id: 2,
             reconciled: false,
             total_shares: Uint128::new(1345),
-            uluna_unclaimed: Uint128::new(1385), // 1.030 Luna per Steak
+            amount_unclaimed: Uint128::new(1385), // 1.030 Luna per Steak
             est_unbond_end_time: 20000,
         },
         Batch {
             id: 3,
             reconciled: false,
             total_shares: Uint128::new(1456),
-            uluna_unclaimed: Uint128::new(1506), // 1.035 Luna per Steak
+            amount_unclaimed: Uint128::new(1506), // 1.035 Luna per Steak
             est_unbond_end_time: 30000,
         },
         Batch {
             id: 4,
             reconciled: false,
             total_shares: Uint128::new(1567),
-            uluna_unclaimed: Uint128::new(1629), // 1.040 Luna per Steak
+            amount_unclaimed: Uint128::new(1629), // 1.040 Luna per Steak
             est_unbond_end_time: 40000,          // not yet finished unbonding, ignored
         },
     ];
@@ -720,7 +721,7 @@ fn reconciling() {
             id: 2,
             reconciled: true,
             total_shares: Uint128::new(1345),
-            uluna_unclaimed: Uint128::new(1112), // 1385 - 273
+            amount_unclaimed: Uint128::new(1112), // 1385 - 273
             est_unbond_end_time: 20000,
         }
     );
@@ -732,7 +733,7 @@ fn reconciling() {
             id: 3,
             reconciled: true,
             total_shares: Uint128::new(1456),
-            uluna_unclaimed: Uint128::new(1233), // 1506 - 273
+            amount_unclaimed: Uint128::new(1233), // 1506 - 273
             est_unbond_end_time: 30000,
         }
     );
@@ -798,28 +799,28 @@ fn withdrawing_unbonded() {
             id: 1,
             reconciled: true,
             total_shares: Uint128::new(92876),
-            uluna_unclaimed: Uint128::new(95197), // 1.025 Luna per Steak
+            amount_unclaimed: Uint128::new(95197), // 1.025 Luna per Steak
             est_unbond_end_time: 10000,
         },
         Batch {
             id: 2,
             reconciled: true,
             total_shares: Uint128::new(34567),
-            uluna_unclaimed: Uint128::new(35604), // 1.030 Luna per Steak
+            amount_unclaimed: Uint128::new(35604), // 1.030 Luna per Steak
             est_unbond_end_time: 20000,
         },
         Batch {
             id: 3,
             reconciled: false, // finished unbonding, but not reconciled; ignored
             total_shares: Uint128::new(45678),
-            uluna_unclaimed: Uint128::new(47276), // 1.035 Luna per Steak
+            amount_unclaimed: Uint128::new(47276), // 1.035 Luna per Steak
             est_unbond_end_time: 20000,
         },
         Batch {
             id: 4,
             reconciled: true,
             total_shares: Uint128::new(56789),
-            uluna_unclaimed: Uint128::new(59060), // 1.040 Luna per Steak
+            amount_unclaimed: Uint128::new(59060), // 1.040 Luna per Steak
             est_unbond_end_time: 30000, // reconciled, but not yet finished unbonding; ignored
         },
     ];
@@ -899,7 +900,7 @@ fn withdrawing_unbonded() {
             id: 1,
             reconciled: true,
             total_shares: Uint128::new(69420),
-            uluna_unclaimed: Uint128::new(71155),
+            amount_unclaimed: Uint128::new(71155),
             est_unbond_end_time: 10000,
         }
     );
@@ -1159,28 +1160,28 @@ fn querying_previous_batches() {
             id: 1,
             reconciled: false,
             total_shares: Uint128::new(123),
-            uluna_unclaimed: Uint128::new(678),
+            amount_unclaimed: Uint128::new(678),
             est_unbond_end_time: 10000,
         },
         Batch {
             id: 2,
             reconciled: true,
             total_shares: Uint128::new(234),
-            uluna_unclaimed: Uint128::new(789),
+            amount_unclaimed: Uint128::new(789),
             est_unbond_end_time: 15000,
         },
         Batch {
             id: 3,
             reconciled: false,
             total_shares: Uint128::new(345),
-            uluna_unclaimed: Uint128::new(890),
+            amount_unclaimed: Uint128::new(890),
             est_unbond_end_time: 20000,
         },
         Batch {
             id: 4,
             reconciled: true,
             total_shares: Uint128::new(456),
-            uluna_unclaimed: Uint128::new(999),
+            amount_unclaimed: Uint128::new(999),
             est_unbond_end_time: 25000,
         },
     ];

@@ -21,6 +21,8 @@ pub struct InstantiateMsg {
     pub unbond_period: u64,
     /// Initial set of validators who will receive the delegations
     pub validators: Vec<String>,
+    /// Bond denom
+    pub bond_denom: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -141,9 +143,9 @@ pub struct ConfigResponse {
 pub struct StateResponse {
     /// Total supply to the Steak token
     pub total_usteak: Uint128,
-    /// Total amount of uluna staked
-    pub total_uluna: Uint128,
-    /// The exchange rate between usteak and uluna, in terms of uluna per usteak
+    /// Total amount of `bond_denom` staked
+    pub total_amount: Uint128,
+    /// The exchange rate between usteak and `bond_denom`, in terms of `bond_denom` per usteak
     pub exchange_rate: Decimal,
     /// Staking rewards currently held by the contract that are ready to be reinvested
     pub unlocked_coins: Vec<Coin>,
@@ -167,8 +169,8 @@ pub struct Batch {
     pub reconciled: bool,
     /// Total amount of shares remaining this batch. Each `usteak` burned = 1 share
     pub total_shares: Uint128,
-    /// Amount of `uluna` in this batch that have not been claimed
-    pub uluna_unclaimed: Uint128,
+    /// Amount of `bond_denom` in this batch that have not been claimed
+    pub amount_unclaimed: Uint128,
     /// Estimated time when this batch will finish unbonding
     pub est_unbond_end_time: u64,
 }
